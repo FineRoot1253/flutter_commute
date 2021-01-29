@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:commute/UI/main_screen.dart';
+import 'package:commute/common/ip.dart';
+import 'package:commute/data/apis/sp_api.dart';
+import 'package:commute/data/models/enums.dart';
 import 'package:commute/data/models/user_model.dart';
 import 'package:commute/data/repository/user_repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +16,7 @@ class AController extends GetxController{
 
   final UserRepository userRepository;
   UserModel _user;
+  final SPApi spApi = SPApi();
 
   AController({@required this.userRepository}) : assert(userRepository != null);
 
@@ -24,9 +29,17 @@ class AController extends GetxController{
   List<bool> get toggleList => this._toggleList;
   set toggleList(List<bool> list){this._toggleList=list;}
 
+  Future init() async {
+    // this._user = UserModel(state: UserState.waiting_request);
+    if(!(await checkUserNetwork())) return Future.value(1);
+    if(!(await checkUserId()))return Future.value(1);
+    return Future.value(0);
+  }
+
   setUser(){
     final String userId = Uuid().v4();
-    this._user = UserModel(userId: userId,name: registerFormController.text, isCommuted: true);
+    this._user = UserModel(userId: userId, name: registerFormController.text, isCommuted: true);
+
   }
 
   registerUser() async {
@@ -35,16 +48,21 @@ class AController extends GetxController{
 
   checkUserRegistration(String userId) async {
     String result = await userRepository.searchUserdata(userId);
+    print("3) 유저 체크 체크 체크");
     if(result.startsWith("Error")||result.startsWith("error"))
-        throw Exception('Not Found');
-    this._user = UserModel.fromJson(jsonDecode(result));
-    return this._user;
+      this._user = UserModel(userId : userId, state: UserState.register_required);
+    else
+      this._user = UserModel.fromJson(jsonDecode(result));
   }
 
   updateUserData() async {
+
     var res = await userRepository.updateUserdata(this._user);
+
     print(res);
+
     this._user = UserModel.fromJson(jsonDecode(res));
+
     return Future<void>.value();
   }
 
@@ -65,6 +83,39 @@ class AController extends GetxController{
     while(this._user.isCommuted){
       await Future.delayed(Duration(seconds: 1));
       update();
+    }
+  }
+
+  checkUserNetwork() async {
+    var res = await userRepository.getPublicIp();
+
+    print("1) 네트워크 체크");
+    if(res.toString()!=NEWZEN_PUBLIC_IP) {
+      print("1) 네트워크 체크 not ok");
+      this._user = UserModel(state: UserState.network_required);
+
+      return Future.value(false);
+    }else{
+      print("1) 네트워크 체크 ok");
+
+      return Future.value(true);
+    }
+  }
+  checkUserId() async {
+    await spApi.initDone;
+    print("2) 유저 체크 체크");
+
+    if(spApi.userId==null){
+      print("2) 유저 체크 체크 not ok");
+      this._user = UserModel(state: UserState.register_required);
+
+      return Future.value(false);
+
+    }else{
+      print("2) 유저 체크 체크 ok");
+      this.checkUserRegistration(spApi.userId);
+      return Future.value(true);
+
     }
   }
 

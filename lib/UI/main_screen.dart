@@ -1,9 +1,8 @@
-import 'dart:math';
+import 'dart:io';
 
 import 'package:commute/UI/profile_screen.dart';
-import 'package:commute/UI/register_screen.dart';
 import 'package:commute/controller/a_controller.dart';
-import 'package:commute/data/models/user_model.dart';
+import 'package:commute/data/models/enums.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,181 +15,108 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final _controller = AController.to;
-  AnimationController _animationController;
-  final MethodChannel channel = MethodChannel('com.example.commute/wifi');
-  Color _color;
   Future result;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _color = (_controller.user.isCommuted) ? Colors.blue[800] : Colors.red;
-    if (_controller.user.isCommuted) _controller.startTimer();
-
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 450));
-
-    result = channel.invokeMethod('getMacAddress');
+    result = _controller.init();
+    // if (_controller.user !=null &&_controller.user.isCommuted) {
+    //   _controller.startTimer();
+    //   if (_controller.toggleList[0])
+    //     _controller.toggleList = _controller.toggleList.reversed.toList();
+    //   print("초기 근태 체크 : ${_controller.user.isCommuted}");
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-      child: Container(
-        height: Get.height - MediaQuery.of(context).padding.top,
-        child: Stack(
-          overflow: Overflow.visible,
-          children: [
-            AnimatedPositioned(
-                top: (_controller.user.isCommuted) ? 0 : -Get.height,
-                duration: Duration(milliseconds: 1200),
-                curve: Curves.bounceOut,
-                onEnd: () {
-                  //TODO : startTimeDiffTimer
-                  _controller.startTimer();
-                },
-                child: Stack(overflow: Overflow.visible, children: [
-                  CustomPaint(
-                    size: Get.size,
-                    painter: CurvePainter(),
-                  ),
-                  Positioned.fill(
-                      child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(top: Get.height * 0.17),
-                      child: Text(
-                        "출근 완료",
-                        style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                  )),
-                  Positioned.fill(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: Get.height * 0.25),
-                        child: SizedBox(
-                          width: Get.width * 0.5,
-                          height: Get.height * 0.16,
-                          child: Card(
-                            elevation: 10,
-                            child: Center(
-                              child: GetBuilder<AController>(
-                                builder: (_) => Text(_.calculateTimeDiff()),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                      child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(top: Get.height * 0.23),
-                      child: Card(
-                        shape: CircleBorder(),
-                        elevation: 20,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Icon(Icons.check),
-                        ),
-                      ),
-                    ),
-                  )),
-                ])),
-
-            // Center(
-            //   child: IconButton(
-            //     iconSize: 50,
-            //       icon: AnimatedIcon(color:Colors.blue,icon: AnimatedIcons.menu_home, progress: _animationController),
-            //     splashColor: Colors.blueAccent,
-            //     onPressed: () async {
-            //       _controller.user.isCommuted = !_controller.user.isCommuted;
-            //       await _controller.updateUserData();
-            //       setState(() {
-            //         (_controller.user.isCommuted) ? _animationController.forward() : _animationController.reverse();
-            //
-            //       });
-            //     },
-            //   ),
-            // ),
-            Center(
-              child: ToggleButtons(
-                isSelected: _controller.toggleList,
-                children: <Widget>[
-                  Icon(Icons.home),
-                  Icon(Icons.work_outline_rounded)
-                ],
-                onPressed: (int index) async {
-
-                  if(!_controller.toggleList[index]){
-
-
-                    await _controller.updateUserData();
-
-                    _controller.user.isCommuted = !_controller.user.isCommuted;
-
-                    setState(() {
-                      _controller.toggleList = _controller.toggleList.reversed.toList();
-                    });
-
-                  }
-                },
-              ),
+          child: Container(
+            height: Get.height - MediaQuery
+                .of(context)
+                .padding
+                .top,
+            child: FutureBuilder(
+                future: result,
+                builder: (context, snapshot){
+                  if(snapshot.hasData)return buildMainContent();
+                  if(snapshot.hasError)return Center(
+                    child: Text("error : \n${snapshot.error.toString()}"),);
+                  return Center(child: CircularProgressIndicator(),);
+                }
             ),
-            DraggableScrollableSheet(
-                initialChildSize: 0.095,
-                minChildSize: 0.085,
-                maxChildSize: 0.4,
-                builder: (context, controller) => Stack(
-                      overflow: Overflow.clip,
-                      children: [
-                        SingleChildScrollView(
-                          controller: controller,
-                          child: Card(
-                              elevation: 15,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24)),
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(24)),
-                                  child: buildContent())),
-                        ),
-                        Positioned.fill(
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Padding(
-                              padding:
-                                  EdgeInsets.only(bottom: Get.height * 0.4),
-                              child: OverflowBox(
-                                maxHeight: 200,
-                                maxWidth: 200,
-                                child: Card(
-                                  shape: CircleBorder(),
-                                  elevation: 10,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    child: Icon(Icons.person),
-                                  ),
-                                ),
+          ),
+        ));
+  }
+
+  Widget buildMainContent(){
+    return Stack(
+      overflow: Overflow.visible,
+      children: [
+        _controller.user.statePanelWidget,
+        AnimatedPositioned(
+            top: (_controller.user.isCommuted) ? 0 : -Get.height,
+            duration: Duration(milliseconds: 1200),
+            curve: Curves.bounceOut,
+            onEnd: () {
+              //TODO : startTimeDiffTimer
+              _controller.startTimer();
+            },
+            child: _controller.user.statePanelWidget),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: Get.height * 0.05),
+            child: buildBtn()
+          ),
+        ),
+        DraggableScrollableSheet(
+            initialChildSize: 0.095,
+            minChildSize: 0.085,
+            maxChildSize: 0.4,
+            builder: (context, controller) =>
+                Stack(
+                  overflow: Overflow.clip,
+                  children: [
+                    SingleChildScrollView(
+                      controller: controller,
+                      child: Card(
+                          elevation: 15,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24)),
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                      24)),
+                              child: buildContent())),
+                    ),
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding:
+                          EdgeInsets.only(bottom: Get.height * 0.4),
+                          child: OverflowBox(
+                            maxHeight: 200,
+                            maxWidth: 200,
+                            child: Card(
+                              shape: CircleBorder(),
+                              elevation: 10,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: Icon(Icons.person),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    )),
-          ],
-        ),
-      ),
-    ));
+                      ),
+                    ),
+                  ],
+                )),
+      ],
+    );
   }
 
   Widget buildContent() {
@@ -204,16 +130,52 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget buildHandle() {
-    return Container(
-      height: 5,
-      width: 30,
-      decoration: BoxDecoration(
-          color: Colors.grey[200], borderRadius: BorderRadius.circular(16)),
+  Widget buildToggleBtns() {
+    return ToggleButtons(
+      isSelected: _controller.toggleList,
+      children: <Widget>[
+        Icon(Icons.home),
+        Icon(Icons.apartment)
+      ],
+      onPressed: (int index) async {
+        if (!_controller.toggleList[index]) {
+          _controller.user.isCommuted = !_controller.user.isCommuted;
+          await _controller.updateUserData();
+          setState(() {
+            _controller.toggleList = _controller.toggleList.reversed.toList();
+          });
+        }
+      },
     );
   }
 
-  Widget buildSomething() {
-    return Container();
+  Widget buildBtn() {
+    print("현재 유저 상태 : ${_controller.user.state}");
+    switch(_controller.user.state){
+      case UserState.certificated_offDuty:
+      case UserState.certificated_onDuty: // togglebtn() needed
+        return buildToggleBtns();
+        break;
+      case UserState.register_required: // Get.to("/register") needed
+          return buildFlatBtn((){
+            Get.toNamed('/register');
+          });
+        break;
+      case UserState.network_required: // exit(0) logic needed
+        return buildFlatBtn((){
+          if(Platform.isAndroid) exit(0);
+          else SystemNavigator.pop();
+        });
+        break;
+      default:
+        return Container();
+        break;
+    }
   }
+
+
+  Widget buildFlatBtn(Function func){
+    return RaisedButton(onPressed: func, child: Text("확인"),shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),);
+  }
+
 }

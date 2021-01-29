@@ -17,7 +17,7 @@ class RegisterScreen extends StatelessWidget {
         },
         child: Stack(
           children: <Widget>[
-            CustomPaint(size: Get.size, painter: CurvePainter()),
+            CustomPaint(size: Get.size, painter: CurvePainter(Colors.blue[800])),
             Center(
                 child: Padding(
               padding: EdgeInsets.only(bottom: Get.height * 0.3),
@@ -63,10 +63,14 @@ class RegisterScreen extends StatelessWidget {
 
 class CurvePainter extends CustomPainter {
 
+  Color _color;
+
+  CurvePainter(this._color);
+
   @override
   void paint(Canvas canvas, Size size) {
     var paint = Paint();
-    paint.color = Colors.blue[800];
+    paint.color = this._color;
     paint.style = PaintingStyle.fill;
 
     var path = Path();

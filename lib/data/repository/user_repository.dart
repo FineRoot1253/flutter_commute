@@ -20,6 +20,7 @@ class UserRepository{
   Future searchUserdata(String userId) async => await httpApi.get(userId);
 
   Future updateUserdata(UserModel user) async => await httpApi.put(user);
-  
+
+  Future getPublicIp() async =>  await httpApi.getPublicIp();
 
 }

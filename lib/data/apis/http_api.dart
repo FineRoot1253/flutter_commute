@@ -6,7 +6,7 @@ class HttpApi{
 
   String _url = URL;
 
-  HttpApi();
+  HttpApi(this._url);
 
   Future get(String userId) async {
    var res = await http.get(this._url+"/user/$userId");
@@ -39,6 +39,13 @@ class HttpApi{
     return (res.statusCode == 500) ?
       "errer :\n${res.statusCode}" :
     Future.value(0);
+  }
+
+  Future getPublicIp() async {
+
+    var res = await http.get('https://api.ipify.org');
+    return res.body;
+
   }
 
   set url(String url){this._url=url;}

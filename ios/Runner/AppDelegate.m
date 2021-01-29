@@ -41,13 +41,17 @@
 }
 
 - (NSString *)getMacAddress {
-    CFArrayRef arr = CNCopySupportedInterfaces();
-    CFStringRef interfaceNm = CFArrayGetValueAtIndex(arr, 0);
-    CFDictionaryRef captiveNtwrDict = CNCopyCurrentNetworkInfo(interfaceNm);
-    NSDictionary* dict = (__bridge NSDictionary*) captiveNtwrDict;
-    NSLog(@"DICT DESCIPTIONs : %@", [dict description]);
-    NSString* bssid = [dict objectForKey:@"BSSID"];
-    NSLog(@"BSSID : %@",[bssid description]);
-    return bssid;
+    NSString *bssId = nil;
+    NSArray *ifs = (__bridge_transfer id)CNCopySupportedInterfaces();
+    NSLog(@"ifs DESCIPTIONs : %@", [ifs description]);
+    for (NSString *ifnam in ifs) {
+        NSDictionary *info = (__bridge_transfer id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)ifnam);
+        NSLog(@"DICT DESCIPTIONs : %@", [info description]);
+        if (info[@"BSSID"]) {
+            NSLog(@"BSSID : %@",[info description]);
+            bssId = info[@"BSSID"];
+        }
+    }
+    return bssId;
 }
 @end

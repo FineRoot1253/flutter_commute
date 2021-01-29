@@ -1,0 +1,1 @@
+const NEWZEN_PUBLIC_IP = '112.218.88.115';
