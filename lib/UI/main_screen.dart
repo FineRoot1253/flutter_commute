@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:commute/UI/profile_screen.dart';
+import 'package:commute/UI/widgets/state_panel_widget.dart';
 import 'package:commute/controller/a_controller.dart';
+import 'package:commute/controller/time_counter_controller.dart';
 import 'package:commute/data/models/enums.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final _controller = AController.to;
+  final _timerController = Get.put(TimeCounterController());
   Future result;
 
   @override
@@ -42,6 +45,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             child: FutureBuilder(
                 future: result,
                 builder: (context, snapshot){
+                  print(result);
                   if(snapshot.hasData)return buildMainContent();
                   if(snapshot.hasError)return Center(
                     child: Text("error : \n${snapshot.error.toString()}"),);
@@ -56,20 +60,32 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return Stack(
       overflow: Overflow.visible,
       children: [
-        _controller.user.statePanelWidget,
-        AnimatedPositioned(
-            top: (_controller.user.isCommuted) ? 0 : -Get.height,
-            duration: Duration(milliseconds: 1200),
-            curve: Curves.bounceOut,
-            onEnd: () {
-              //TODO : startTimeDiffTimer
-              _controller.startTimer();
-            },
-            child: _controller.user.statePanelWidget),
+        buildBackGround(_controller.user.state),
+        GetBuilder<AController>(
+          builder:(_) => AnimatedPositioned(
+              top: (_.user.isCommuted) ? 0 : -Get.height,
+              duration: Duration(milliseconds: 1200),
+              curve: Curves.bounceOut,
+              onEnd: () {
+                //TODO : startTimeDiffTimer
+                _timerController.toggle = _controller.user.isCommuted;
+                _timerController.startTimer();
+              },
+              child: _.user.statePanelWidget),
+        ),
         Center(
           child: Padding(
             padding: EdgeInsets.only(top: Get.height * 0.05),
-            child: buildBtn()
+            child: GetBuilder<AController>(
+                initState: (_){
+                  if(_controller.user.isCommuted) {
+                    _controller.toggleList =
+                        _controller.toggleList.reversed.toList();
+                    _timerController.toggle = _controller.user.isCommuted;
+                    _timerController.startTimer();
+                  }
+                },
+                builder:(_) =>buildBtn())
           ),
         ),
         DraggableScrollableSheet(
@@ -119,6 +135,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget buildBackGround(UserState state){
+    switch(state){
+      case UserState.certificated_onDuty:
+      case UserState.certificated_offDuty:
+        return StatePanelWidget.fromUserState(UserState.certificated_offDuty);
+      default :
+        return _controller.user.statePanelWidget;
+    }
+  }
+
   Widget buildContent() {
     return Column(
       children: [
@@ -130,7 +156,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget buildToggleBtns() {
+  Widget buildToggleBtns(bool isOnDuty) {
     return ToggleButtons(
       isSelected: _controller.toggleList,
       children: <Widget>[
@@ -141,20 +167,20 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         if (!_controller.toggleList[index]) {
           _controller.user.isCommuted = !_controller.user.isCommuted;
           await _controller.updateUserData();
-          setState(() {
-            _controller.toggleList = _controller.toggleList.reversed.toList();
-          });
+          _controller.toggleList = _controller.toggleList.reversed.toList();
+          _controller.update();
         }
       },
     );
   }
 
   Widget buildBtn() {
-    print("현재 유저 상태 : ${_controller.user.state}");
     switch(_controller.user.state){
       case UserState.certificated_offDuty:
+        return buildToggleBtns(false);
+        break;
       case UserState.certificated_onDuty: // togglebtn() needed
-        return buildToggleBtns();
+        return buildToggleBtns(true);
         break;
       case UserState.register_required: // Get.to("/register") needed
           return buildFlatBtn((){

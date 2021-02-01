@@ -1,8 +1,9 @@
 import 'package:commute/UI/main_screen.dart';
+import 'package:commute/UI/register_screen.dart';
 import 'package:get/get.dart';
 
 final routes = [
   GetPage(name: '/main',page: () => MainScreen()),
   GetPage(name: '/profile',page: () => MainScreen()),
-  GetPage(name: '/register',page: () => MainScreen()),
+  GetPage(name: '/register',page: () => RegisterScreen()),
 ];

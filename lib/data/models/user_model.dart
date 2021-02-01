@@ -34,7 +34,8 @@ class UserModel {
     this._name = record["userNm"] ?? " ",
     this._isCommuted = record["isCommuted"] ?? false,
     this._lastUpdatedAt = DateTime.tryParse(record["updatedAt"]) ?? DateTime.now(),
-    this._state = record["isCommuted"] ? UserState.certificated_onDuty : UserState.certificated_offDuty;
+    this._state = record["isCommuted"] ? UserState.certificated_onDuty : UserState.certificated_offDuty,
+    this._statePanelWidget = StatePanelWidget.fromUserState(record["isCommuted"] ? UserState.certificated_onDuty : UserState.certificated_offDuty);
   
   toMap() =>
     {"userId":this._userId,

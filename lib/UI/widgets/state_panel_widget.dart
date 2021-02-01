@@ -1,5 +1,6 @@
 import 'package:commute/UI/register_screen.dart';
 import 'package:commute/controller/a_controller.dart';
+import 'package:commute/controller/time_counter_controller.dart';
 import 'package:commute/data/models/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -66,10 +67,11 @@ class StatePanelWidget extends StatelessWidget {
               child: Card(
                 elevation: 10,
                 child: Center(
-                  child: GetBuilder<AController>(
+                  child: GetBuilder<TimeCounterController>(
+                    init: TimeCounterController(),
                     builder: (_) => (this._iconData == Icons.check) ?
-                    Text(_.calculateTimeDiff()) :
-                    Container(height : 0.0, width: 0.0),
+                    Text(_.calculateTimeDiff(this._controller.user.lastUpdateAt)) :
+                    Container(height : 0.0, width: 0.0,child: Text(""),),
                   ),
                 ),
               ),

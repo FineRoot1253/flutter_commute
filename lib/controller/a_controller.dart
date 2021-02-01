@@ -53,6 +53,8 @@ class AController extends GetxController{
       this._user = UserModel(userId : userId, state: UserState.register_required);
     else
       this._user = UserModel.fromJson(jsonDecode(result));
+
+    return Future<void>.value();
   }
 
   updateUserData() async {
@@ -67,7 +69,7 @@ class AController extends GetxController{
   }
 
   String calculateTimeDiff() {
-    Duration diff = DateTime.now().difference(this._user.lastUpdateAt);
+    Duration diff = DateTime.now().difference(this._user.lastUpdateAt.toUtc());
     return durationParseToString(diff) + "경과";
   }
 
@@ -76,15 +78,10 @@ class AController extends GetxController{
   }
 
   String dateTimeParseToString(DateTime date){
-    return DateFormat('y-MM-d hh:mm:ss a').format(date);
+    return DateFormat('y-MM-dd hh:mm:ss a').format(date);
   }
 
-  startTimer() async {
-    while(this._user.isCommuted){
-      await Future.delayed(Duration(seconds: 1));
-      update();
-    }
-  }
+
 
   checkUserNetwork() async {
     var res = await userRepository.getPublicIp();
@@ -113,7 +110,7 @@ class AController extends GetxController{
 
     }else{
       print("2) 유저 체크 체크 ok");
-      this.checkUserRegistration(spApi.userId);
+      await this.checkUserRegistration(spApi.userId);
       return Future.value(true);
 
     }
