@@ -189,8 +189,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         break;
       case UserState.network_required: // exit(0) logic needed
         return buildFlatBtn((){
-          if(Platform.isAndroid) exit(0);
-          else SystemNavigator.pop();
+          if(Platform.isAndroid) SystemNavigator.pop();
+          else exit(0);
         });
         break;
       default:

@@ -69,16 +69,15 @@ class StatePanelWidget extends StatelessWidget {
                 child: Center(
                   child: GetBuilder<TimeCounterController>(
                     init: TimeCounterController(),
-                    builder: (_) => (this._iconData == Icons.check) ?
-                    Text(_.calculateTimeDiff(this._controller.user.lastUpdateAt)) :
-                    Container(height : 0.0, width: 0.0,child: Text(""),),
+                    builder: (_) => (this._controller.user.state == UserState.certificated_onDuty) ?
+                    Text(_.calculateTimeDiff(this._controller.user.lastUpdateAt.toLocal())) :
+                    Text(this._content+"인 상태입니다."),),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
       Positioned.fill(
           child: Align(
         alignment: Alignment.topCenter,

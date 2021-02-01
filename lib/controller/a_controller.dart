@@ -86,7 +86,7 @@ class AController extends GetxController{
   checkUserNetwork() async {
     var res = await userRepository.getPublicIp();
 
-    print("1) 네트워크 체크");
+    print("1) 네트워크 체크 : $res");
     if(res.toString()!=NEWZEN_PUBLIC_IP) {
       print("1) 네트워크 체크 not ok");
       this._user = UserModel(state: UserState.network_required);
