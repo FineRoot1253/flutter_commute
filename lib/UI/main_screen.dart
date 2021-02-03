@@ -25,12 +25,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     // TODO: implement initState
     super.initState();
     result = _controller.init();
-    // if (_controller.user !=null &&_controller.user.isCommuted) {
-    //   _controller.startTimer();
-    //   if (_controller.toggleList[0])
-    //     _controller.toggleList = _controller.toggleList.reversed.toList();
-    //   print("초기 근태 체크 : ${_controller.user.isCommuted}");
-    // }
   }
 
   @override
@@ -63,12 +57,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         buildBackGround(_controller.user.state),
         GetBuilder<AController>(
           builder:(_) => AnimatedPositioned(
-              top: (_.user.isCommuted) ? 0 : -Get.height,
+              top: (_.user.stateNum>0) ? 0 : -Get.height,
               duration: Duration(milliseconds: 1200),
               curve: Curves.bounceOut,
               onEnd: () {
                 //TODO : startTimeDiffTimer
-                _timerController.toggle = _controller.user.isCommuted;
+                _timerController.toggle = _controller.user.stateNum > 0;
                 _timerController.startTimer();
               },
               child: _.user.statePanelWidget),
@@ -78,10 +72,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             padding: EdgeInsets.only(top: Get.height * 0.05),
             child: GetBuilder<AController>(
                 initState: (_){
-                  if(_controller.user.isCommuted) {
+                  if(_controller.user.stateNum>0) {
                     _controller.toggleList =
                         _controller.toggleList.reversed.toList();
-                    _timerController.toggle = _controller.user.isCommuted;
+                    _timerController.toggle = _controller.user.stateNum>0;
                     _timerController.startTimer();
                   }
                 },
@@ -137,9 +131,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   Widget buildBackGround(UserState state){
     switch(state){
-      case UserState.certificated_onDuty:
-      case UserState.certificated_offDuty:
-        return StatePanelWidget.fromUserState(UserState.certificated_offDuty);
+      case UserState.certificated_onWork:
+      case UserState.certificated_beforeWork:
+        return StatePanelWidget.fromUserState(UserState.certificated_beforeWork);
       default :
         return _controller.user.statePanelWidget;
     }
@@ -161,13 +155,30 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       isSelected: _controller.toggleList,
       children: <Widget>[
         Icon(Icons.home),
-        Icon(Icons.apartment)
+        Icon(Icons.apartment),
+        Icon(Icons.directions_car)
       ],
       onPressed: (int index) async {
         if (!_controller.toggleList[index]) {
-          _controller.user.isCommuted = !_controller.user.isCommuted;
+          int lastIndex = _controller.toggleList.indexWhere((element) => element);
+          switch(lastIndex){
+            case 0:
+              bool result = await Get.defaultDialog(title:"알림", content: Text("출근 하시겠습니까?"),onConfirm: () => true, onCancel: () => false);
+              if(!result) return;
+              break;
+            case 1:
+                bool result = await Get.defaultDialog(title:"알림", content: Text("${(index==0) ? "퇴근" : "외근기록"} 하시겠습니까?"),onConfirm: () => true, onCancel: () => false);
+                if(!result) return;
+              break;
+            case 2:
+               bool result = await Get.defaultDialog(title:"알림", content: Text("${(index==0) ? "퇴근" : "외근복귀"} 하시겠습니까?"),onConfirm: () => true, onCancel: () => false);
+               if(!result) return;
+              break;
+          }
+          _controller.user.stateNum = lastIndex;
           await _controller.updateUserData();
-          _controller.toggleList = _controller.toggleList.reversed.toList();
+          _controller.toggleList = [false,false,false];
+          _controller.toggleList[index]=true;
           _controller.update();
         }
       },
@@ -176,10 +187,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   Widget buildBtn() {
     switch(_controller.user.state){
-      case UserState.certificated_offDuty:
+      case UserState.certificated_beforeWork:
         return buildToggleBtns(false);
         break;
-      case UserState.certificated_onDuty: // togglebtn() needed
+      case UserState.certificated_onWork: // togglebtn() needed
         return buildToggleBtns(true);
         break;
       case UserState.register_required: // Get.to("/register") needed

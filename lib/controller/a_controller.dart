@@ -23,14 +23,13 @@ class AController extends GetxController{
   static AController get to => Get.find<AController>();
 
   final TextEditingController registerFormController = TextEditingController();
-  List<bool> _toggleList = [true, false];
+  List<bool> _toggleList = [true, false, false];
 
   UserModel get user => this._user;
   List<bool> get toggleList => this._toggleList;
   set toggleList(List<bool> list){this._toggleList=list;}
 
   Future init() async {
-    // this._user = UserModel(state: UserState.waiting_request);
     if(!(await checkUserNetwork())) return Future.value(1);
     if(!(await checkUserId()))return Future.value(1);
     return Future.value(0);
@@ -38,7 +37,7 @@ class AController extends GetxController{
 
   setUser(){
     final String userId = Uuid().v4();
-    this._user = UserModel(userId: userId, name: registerFormController.text, isCommuted: true);
+    this._user = UserModel(userId: userId, name: registerFormController.text, stateNum: 1);
 
   }
 
@@ -114,6 +113,9 @@ class AController extends GetxController{
       return Future.value(true);
 
     }
+  }
+  checkUserWorkTimeWhileOutside() async {
+
   }
 
 }

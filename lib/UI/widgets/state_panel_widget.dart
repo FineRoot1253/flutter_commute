@@ -4,6 +4,7 @@ import 'package:commute/controller/time_counter_controller.dart';
 import 'package:commute/data/models/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class StatePanelWidget extends StatelessWidget {
   final _controller = AController.to;
@@ -17,22 +18,32 @@ class StatePanelWidget extends StatelessWidget {
   factory StatePanelWidget.fromUserState(UserState state) {
     StatePanelWidget statePanelWidget;
     switch (state) {
-      case UserState.certificated_onDuty:
-        statePanelWidget = StatePanelWidget(Colors.blue[800], "출근중", Icons.check);
+      case UserState.certificated_onWork:
+        statePanelWidget =
+            StatePanelWidget(Colors.blue[800], "출근중", Icons.check);
         break;
-      case UserState.certificated_offDuty:
-        statePanelWidget = StatePanelWidget(Colors.grey[500], "퇴근중", Icons.check);
+      case UserState.certificated_beforeWork:
+        statePanelWidget =
+            StatePanelWidget(Colors.grey[500], "퇴근중", Icons.home);
+        break;
+      case UserState.certificated_WorkOnOutside:
+        statePanelWidget =
+            StatePanelWidget(Colors.green[500], "외근중", Icons.directions_car);
+        break;
+      case UserState.certificated_returnToWork:
+        statePanelWidget =
+            StatePanelWidget(Colors.grey[850], "복귀중", FontAwesomeIcons.userSecret);
         break;
       case UserState.register_required:
-        statePanelWidget = StatePanelWidget(Colors.red[400], "등록필요", Icons.error);
+        statePanelWidget =
+            StatePanelWidget(Colors.red[400], "등록필요", Icons.error);
         break;
       case UserState.network_required:
-        statePanelWidget =
-            StatePanelWidget(Colors.red[400], "근무지 이탈중!", Icons.wrong_location_sharp);
+        statePanelWidget = StatePanelWidget(
+            Colors.red[400], "근무지 이탈중!", Icons.wrong_location_sharp);
         break;
       default:
-        statePanelWidget =
-            StatePanelWidget(Colors.white, " ", Icons.autorenew);
+        statePanelWidget = StatePanelWidget(Colors.white, " ", Icons.autorenew);
     }
     return statePanelWidget;
   }
@@ -69,15 +80,18 @@ class StatePanelWidget extends StatelessWidget {
                 child: Center(
                   child: GetBuilder<TimeCounterController>(
                     init: TimeCounterController(),
-                    builder: (_) => (this._controller.user.state == UserState.certificated_onDuty) ?
-                    Text(_.calculateTimeDiff(this._controller.user.lastUpdateAt.toLocal())) :
-                    Text(this._content+"인 상태입니다."),),
+                    builder: (_) => (this._controller.user.state ==
+                            UserState.certificated_onWork)
+                        ? Text(_.calculateTimeDiff(
+                            this._controller.user.lastUpdateAt.toLocal()))
+                        : Text(this._content + "인 상태입니다."),
                   ),
                 ),
               ),
             ),
           ),
         ),
+      ),
       Positioned.fill(
           child: Align(
         alignment: Alignment.topCenter,
