@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:commute/data/models/user_model.dart';
 import 'package:commute/url/url.dart';
 import 'package:http/http.dart' as http;
@@ -8,8 +10,8 @@ class HttpApi{
 
   HttpApi(this._url);
 
-  Future get(String userId) async {
-   var res = await http.get(this._url+"/user/$userId");
+  Future get(String userId, [String path = ""]) async {
+   var res = await http.get(this._url+"/$path/$userId");
 
    return (res.statusCode == 404 || res.statusCode == 500) ?
         "error :\n${res.body}" :
@@ -44,10 +46,24 @@ class HttpApi{
   Future getPublicIp() async {
 
     var res = await http.get('https://api.ipify.org');
-    return res.body;
+    return handleResponses(res);
 
   }
 
   set url(String url){this._url=url;}
+
+  dynamic handleResponses(http.Response response){
+
+    switch(response.statusCode){
+      case 200:
+        return response.body;
+        break;
+      case 404:
+        return 404;
+      case 500:
+        return 500;
+        break;
+    }
+  }
 
 }

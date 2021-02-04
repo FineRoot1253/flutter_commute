@@ -110,12 +110,14 @@ class AController extends GetxController{
     }else{
       print("2) 유저 체크 체크 ok");
       await this.checkUserRegistration(spApi.userId);
-      return Future.value(true);
 
+      return Future.value(true);
     }
   }
-  checkUserWorkTimeWhileOutside() async {
 
+
+  checkUserWorkTimeWhileOutside() async {
+    if(this._user.state == UserState.certificated_WorkOnOutside) await this.userRepository.getUserWorkOnOutsideData();
   }
 
 }
