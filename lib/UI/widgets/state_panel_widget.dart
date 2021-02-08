@@ -26,13 +26,9 @@ class StatePanelWidget extends StatelessWidget {
         statePanelWidget =
             StatePanelWidget(Colors.grey[500], "퇴근중", Icons.home);
         break;
-      case UserState.certificated_WorkOnOutside:
+      case UserState.certificated_workOnOutside:
         statePanelWidget =
             StatePanelWidget(Colors.green[500], "외근중", Icons.directions_car);
-        break;
-      case UserState.certificated_returnToWork:
-        statePanelWidget =
-            StatePanelWidget(Colors.grey[850], "복귀중", FontAwesomeIcons.userSecret);
         break;
       case UserState.register_required:
         statePanelWidget =
@@ -50,6 +46,7 @@ class StatePanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(this._controller.user.state);
     return Stack(overflow: Overflow.visible, children: [
       CustomPaint(
         size: Get.size,

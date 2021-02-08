@@ -6,6 +6,7 @@ import 'package:commute/common/ip.dart';
 import 'package:commute/data/apis/sp_api.dart';
 import 'package:commute/data/models/enums.dart';
 import 'package:commute/data/models/user_model.dart';
+import 'package:commute/data/models/user_workOnOutside_model.dart';
 import 'package:commute/data/repository/user_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,7 @@ class AController extends GetxController{
 
   final UserRepository userRepository;
   UserModel _user;
+  UserWOOModel _wooModel;
   final SPApi spApi = SPApi();
 
   AController({@required this.userRepository}) : assert(userRepository != null);
@@ -23,9 +25,10 @@ class AController extends GetxController{
   static AController get to => Get.find<AController>();
 
   final TextEditingController registerFormController = TextEditingController();
-  List<bool> _toggleList = [true, false, false];
+  List<bool> _toggleList = [true, false];
 
   UserModel get user => this._user;
+  UserWOOModel get wooModel => this._wooModel;
   List<bool> get toggleList => this._toggleList;
   set toggleList(List<bool> list){this._toggleList=list;}
 
@@ -37,8 +40,7 @@ class AController extends GetxController{
 
   setUser(){
     final String userId = Uuid().v4();
-    this._user = UserModel(userId: userId, name: registerFormController.text, stateNum: 1);
-
+    this._user = UserModel(userId: userId, name: registerFormController.text);
   }
 
   registerUser() async {
@@ -46,12 +48,8 @@ class AController extends GetxController{
   }
 
   checkUserRegistration(String userId) async {
-    String result = await userRepository.searchUserdata(userId);
     print("3) 유저 체크 체크 체크");
-    if(result.startsWith("Error")||result.startsWith("error"))
-      this._user = UserModel(userId : userId, state: UserState.register_required);
-    else
-      this._user = UserModel.fromJson(jsonDecode(result));
+    this._user = await userRepository.searchUserdata(userId);
 
     return Future<void>.value();
   }
@@ -60,9 +58,9 @@ class AController extends GetxController{
 
     var res = await userRepository.updateUserdata(this._user);
 
-    print(res);
+    print(res.body);
 
-    this._user = UserModel.fromJson(jsonDecode(res));
+    this._user = UserModel.fromJson(jsonDecode(res.body));
 
     return Future<void>.value();
   }
@@ -85,8 +83,8 @@ class AController extends GetxController{
   checkUserNetwork() async {
     var res = await userRepository.getPublicIp();
 
-    print("1) 네트워크 체크 : $res");
-    if(res.toString()!=NEWZEN_PUBLIC_IP) {
+    print("1) 네트워크 체크 : ${res.body}");
+    if(res.body.toString()!=NEWZEN_PUBLIC_IP) {
       print("1) 네트워크 체크 not ok");
       this._user = UserModel(state: UserState.network_required);
 
@@ -111,13 +109,26 @@ class AController extends GetxController{
       print("2) 유저 체크 체크 ok");
       await this.checkUserRegistration(spApi.userId);
 
+      print("4) 유저 외근 체크");
+      if(this._user.state==UserState.certificated_workOnOutside)
+        await checkUserWorkTimeWhileOutside();
+
+
       return Future.value(true);
     }
   }
 
-
   checkUserWorkTimeWhileOutside() async {
-    if(this._user.state == UserState.certificated_WorkOnOutside) await this.userRepository.getUserWorkOnOutsideData();
+    if(this._user.state == UserState.certificated_workOnOutside)
+      this._wooModel = await this.userRepository.getUserWorkOnOutsideData(this._user.userId);
+  }
+
+  setUserWorkTimeWhileOutside() async {
+    if(this._user.state == UserState.certificated_workOnOutside) await this.userRepository.setUserWorkOnOutsideData(this._wooModel);
+  }
+
+  updateUserWorkTimeWhileOutside() async {
+    if(this._user.state == UserState.certificated_workOnOutside) await this.userRepository.updateUserWorkOnOutsideData(this._wooModel);
   }
 
 }

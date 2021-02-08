@@ -25,9 +25,14 @@ class UserWOOModel {
         this._updatedAt = record['updatedAt'] ?? DateTime.now();
 
   String get userId => this._userId;
+
   String get destination => this._destination;
+
   DateTime get createdAt => this._createdAt;
+
   DateTime get updateAt => this._updatedAt;
+
+  toMap() => {"userId": this._userId, "dest": this._destination};
 
   @override
   bool operator ==(Object other) {
@@ -48,5 +53,4 @@ class UserWOOModel {
       this._destination.hashCode ^
       this._createdAt.hashCode ^
       this._updatedAt.hashCode;
-
 }

@@ -1,19 +1,21 @@
 import 'package:commute/UI/widgets/state_panel_widget.dart';
 import 'package:commute/data/models/enums.dart';
+import 'package:commute/data/models/user_workOnOutside_model.dart';
 
 class UserModel {
   String _userId;
   String _name;
-  int _stateNum;
+  bool _isCommuted;
   DateTime _lastUpdatedAt;
   UserState _state;
+  UserWOOModel _wooModel;
   StatePanelWidget _statePanelWidget;
 
-  UserModel({String userId, String name, int stateNum, UserState state}) {
+  UserModel({String userId, String name, UserState state, bool isCommuted}) {
     this._userId = userId ?? "undefined";
     this._name = name ?? " ";
-    this._stateNum = stateNum ?? 0;
     this._lastUpdatedAt = DateTime.now();
+    this._isCommuted = isCommuted ?? false;
     this._state = state ?? UserState.certificated_beforeWork;
     this._statePanelWidget = StatePanelWidget.fromUserState(this._state);
   }
@@ -22,7 +24,7 @@ class UserModel {
 
   String get name => this._name;
 
-  int get stateNum => this._stateNum;
+  bool get isCommuted => this._isCommuted;
 
   DateTime get lastUpdateAt => this._lastUpdatedAt;
 
@@ -30,29 +32,31 @@ class UserModel {
 
   StatePanelWidget get statePanelWidget => this._statePanelWidget;
 
-  set stateNum(int val) {
-    this._stateNum = val;
-  }
+  UserWOOModel get wooModel => this._wooModel;
 
-  UserModel.fromJson(Map<dynamic, dynamic> record, {UserState state})
+  set isCommuted(bool isCommuted){this._isCommuted=isCommuted;}
+  set state(UserState state){this._state = state;}
+
+  UserModel.fromJson(Map<dynamic, dynamic> record)
       : this._userId = record["userId"] ?? -1,
         this._name = record["userNm"] ?? " ",
-        this._stateNum = record["stateNum"] ?? 0,
         this._lastUpdatedAt =
             DateTime.tryParse(record["updatedAt"]).toLocal() ?? DateTime.now(),
-        this._state = record["isCommuted"]
-            ? UserState.certificated_onWork
-            : UserState.certificated_beforeWork,
+        this._state = UserState.values.firstWhere((e)=> e.index == record["state"]),
+        this._isCommuted = record["state"] == null ? false : record["state"]>3 ? true : false,
         this._statePanelWidget = StatePanelWidget.fromUserState(
-            record["isCommuted"]
+            record["state"]<3
+                ? UserState.certificated_beforeWork
+                : record["state"] == 4
                 ? UserState.certificated_onWork
-                : UserState.certificated_beforeWork);
+                : UserState.certificated_workOnOutside);
 
   toMap() => {
         "userId": this._userId,
         "userNm": this._name,
-        "state": this._stateNum
+        "state": this._state.index.toString()
       };
+
 
   @override
   bool operator ==(Object other) {
@@ -61,7 +65,6 @@ class UserModel {
             this.runtimeType == other.runtimeType &&
             this._name == other.name &&
             this._userId == other._userId &&
-            this._stateNum == other._stateNum &&
             this._lastUpdatedAt == other._lastUpdatedAt &&
             this._state == other._state &&
             this._statePanelWidget == other._statePanelWidget);
@@ -71,7 +74,6 @@ class UserModel {
   int get hashCode =>
       this._userId.hashCode ^
       this._name.hashCode ^
-      this._stateNum.hashCode ^
       this._lastUpdatedAt.hashCode ^
       this._state.hashCode ^
       this._statePanelWidget.hashCode;
