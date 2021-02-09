@@ -1,6 +1,3 @@
-import 'package:commute/data/models/enums.dart';
-import 'package:commute/data/models/user_model.dart';
-
 class UserWOOModel {
   String _userId;
   String _destination;

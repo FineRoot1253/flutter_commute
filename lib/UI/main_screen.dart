@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:commute/UI/address_search_screen.dart';
 import 'package:commute/UI/profile_screen.dart';
 import 'package:commute/UI/widgets/state_panel_widget.dart';
 import 'package:commute/controller/a_controller.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:kopo/kopo.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -178,8 +176,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         FlatButton(
           onPressed: () async {
             if(!_controller.user.isCommuted) {
-              var res = await Get.to(AddressSearchScreen());
-              print(res.toString());
               _controller.user.isCommuted = !_controller.user.isCommuted;
               _controller.toggleList = _controller.toggleList.reversed.toList();
             }
