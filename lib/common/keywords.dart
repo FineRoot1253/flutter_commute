@@ -1,0 +1,1 @@
+const COMP_ID = "NEWZEN";

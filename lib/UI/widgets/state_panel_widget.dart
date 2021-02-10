@@ -38,6 +38,10 @@ class StatePanelWidget extends StatelessWidget {
         statePanelWidget = StatePanelWidget(
             Colors.red[400], "근무지 이탈중!", Icons.wrong_location_sharp);
         break;
+      case UserState.permission_required:
+        statePanelWidget = StatePanelWidget(
+            Colors.red[400], "위치 권한 필요!", Icons.not_listed_location_sharp);
+        break;
       default:
         statePanelWidget = StatePanelWidget(Colors.white, " ", Icons.autorenew);
     }

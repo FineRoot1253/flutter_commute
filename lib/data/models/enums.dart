@@ -5,6 +5,7 @@ enum UserState{
   certificated_beforeWork,
   certificated_onWork,
   certificated_workOnOutside,
+  permission_required,
 }
 
 extension ParseToString on UserState{

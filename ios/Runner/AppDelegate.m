@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 #import "GeneratedPluginRegistrant.h"
 #import "SystemConfiguration/CaptiveNetwork.h"
+#import "GoogleMaps/GoogleMaps.h"
 
 
 @implementation AppDelegate
@@ -9,7 +10,8 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     FlutterViewController* controller = (FlutterViewController*)self.window.rootViewController;
     FlutterMethodChannel* channel = [FlutterMethodChannel methodChannelWithName:@"com.example.commute/wifi" binaryMessenger:controller.binaryMessenger];
-    
+    [GMSServices provideAPIKey:@"AIzaSyBgrFKkkkrOwMmbMlyWCvJsTxSrwAykJC8"];
+    [GeneratedPluginRegistrant registerWithRegistry:self];
     [channel setMethodCallHandler: ^(FlutterMethodCall* call, FlutterResult result){
         if([@"getBssid" isEqualToString:call.method]) {
             NSString* bssid = [self getBSSID];

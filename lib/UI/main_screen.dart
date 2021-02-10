@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:commute/UI/profile_screen.dart';
+import 'package:commute/UI/widgets/map_widget.dart';
 import 'package:commute/UI/widgets/state_panel_widget.dart';
 import 'package:commute/controller/a_controller.dart';
 import 'package:commute/controller/time_counter_controller.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -194,7 +196,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(15.0)
               ),
           splashColor: Colors.green[300],
-        )
+        ),
+        MapWidget(CameraPosition(target: _controller.compPosition))
       ],
     );
   }
@@ -212,7 +215,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           Get.toNamed('/register');
         });
         break;
-      case UserState.network_required: // exit(0) logic needed
+      case UserState.network_required:
+      case UserState.permission_required:// exit(0) logic needed
         return buildFlatBtn(() {
           if (Platform.isAndroid)
             SystemNavigator.pop();
