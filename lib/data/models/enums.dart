@@ -2,10 +2,11 @@ enum UserState{
   waiting_request,
   network_required,
   register_required,
+  permission_required,
+  outOfPosition,
   certificated_beforeWork,
   certificated_onWork,
   certificated_workOnOutside,
-  permission_required,
 }
 
 extension ParseToString on UserState{

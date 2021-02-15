@@ -34,6 +34,7 @@ class UserRepository {
   Future searchUserdata(String userId) async {
     String result = handleResponses(await httpApi.get(userId, 'user'));
 
+    print(result);
     try{
       if (result.startsWith("Error") || result.startsWith("error"))
         return UserModel(userId: userId, state: UserState.register_required);

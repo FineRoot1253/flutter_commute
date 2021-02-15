@@ -30,6 +30,8 @@ class AController extends GetxController{
 
   final TextEditingController registerFormController = TextEditingController();
   List<bool> _toggleList = [true, false];
+  Set<Marker> _markerSet = Set<Marker>();
+  Set<Circle> _circleSet = Set<Circle>();
 
   Location _compLocation;
   Location _myLocation;
@@ -37,10 +39,12 @@ class AController extends GetxController{
   UserModel get user => this._user;
   UserWOOModel get wooModel => this._wooModel;
   List<bool> get toggleList => this._toggleList;
+  Set<Marker> get markerSet => this._markerSet;
+  Set<Circle> get circleSet => this._circleSet;
   Location get compLocation => this._compLocation;
   Location get myLocation => this._myLocation;
-
   LatLng get compPosition => this._compLocation.marker.position;
+  LatLng get myPosition => this._myLocation.marker.position;
 
   set toggleList(List<bool> list){this._toggleList=list;}
 
@@ -52,7 +56,7 @@ class AController extends GetxController{
 
   setUser(){
     final String userId = Uuid().v4();
-    this._user = UserModel(userId: userId, name: registerFormController.text);
+    this._user = UserModel(userId: userId, name: registerFormController.text, isCommuted: true);
   }
 
   registerUser() async {
@@ -145,17 +149,19 @@ class AController extends GetxController{
       return Future.value(false);
     }else{
       print("2) 유저 체크 체크 ok");
-      this._user = await userRepository.searchUserdata(this._user.userId);
-      return Future.value(false);
+      this._user = await userRepository.searchUserdata(spApi.userId);
+      return Future.value(true);
     }
   }
 
-  getUserLocation() async {
+  Future getUserLocation() async {
     Position position =  await Geolocator.getCurrentPosition();
     LatLng myLatLng = LatLng(position.latitude, position.longitude);
     LatLng compLatLng = LatLng(DEFAULT_COORDINATES_LAT,DEFAULT_COORDINATES_LNG);
-    this._myLocation = Location(latLng: myLatLng, locationId: this._user.userId);
-    this._compLocation = Location(latLng: compLatLng, locationId: COMP_ID);
+    this._myLocation = Location(latLng: myLatLng, locationId: this._user.userId,title: "내위치",);
+    this._compLocation = Location(latLng: compLatLng, locationId: COMP_ID,title: "근무지 위치");
+    this._markerSet = {this._compLocation.marker, this._myLocation.marker};
+    this._circleSet = {this._compLocation.circle};
   }
 
   getWooModel() async {
@@ -166,9 +172,17 @@ class AController extends GetxController{
   }
 
   setUserWorkTimeWhileOutside() async {
+    if(this._wooModel==null) this._wooModel = UserWOOModel(userId : this._user.userId, destination: "unknown");
     if(this._user.state == UserState.certificated_workOnOutside) await this.userRepository.setUserWorkOnOutsideData(this._wooModel);
   }
 
   updateUserWorkTimeWhileOutside() async => await this.userRepository.updateUserWorkOnOutsideData(this._wooModel);
+
+  calculateDistanceDiff() => Geolocator.distanceBetween(this.compPosition.latitude, this.compPosition.longitude, this.myPosition.latitude, this.myPosition.longitude);
+
+  Future distanceCheck() async {
+    await getUserLocation();
+    return calculateDistanceDiff() <= 150 ? Future.value(true) : Future.value(false);
+  }
 
 }

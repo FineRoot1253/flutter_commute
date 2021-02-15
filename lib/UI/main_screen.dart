@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:commute/UI/profile_screen.dart';
+import 'package:commute/UI/widgets/dialogs.dart';
 import 'package:commute/UI/widgets/map_widget.dart';
 import 'package:commute/UI/widgets/state_panel_widget.dart';
 import 'package:commute/controller/a_controller.dart';
 import 'package:commute/controller/time_counter_controller.dart';
 import 'package:commute/data/models/enums.dart';
-import 'package:commute/data/models/user_workOnOutside_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,45 +34,51 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-      child: Container(
-        height: Get.height - MediaQuery.of(context).padding.top,
-        child: FutureBuilder(
-            future: result,
-            builder: (context, snapshot) {
-              print(result);
-              if (snapshot.hasData) return buildMainContent();
-              if (snapshot.hasError)
-                return Center(
-                  child: Text("error : \n${snapshot.error.toString()}"),
-                );
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }),
-      ),
-    ));
+          child: Container(
+            height: Get.height - MediaQuery
+                .of(context)
+                .padding
+                .top,
+            child: FutureBuilder(
+                future: result,
+                builder: (context, snapshot) {
+                  print(result);
+                  if (snapshot.hasData) return buildMainContent();
+                  if (snapshot.hasError)
+                    return Center(
+                      child: Text("error : \n${snapshot.error.toString()}"),
+                    );
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }),
+          ),
+        ));
   }
 
   Widget buildMainContent() {
+    print(_controller.user.isCommuted); //TODO: usermodel 생성자에 로그 찍어보ㄱ
     return Stack(
       overflow: Overflow.visible,
       children: [
         buildBackGround(_controller.user.state),
         GetBuilder<AController>(
-          builder: (_) => AnimatedPositioned(
-              top: (_.user.isCommuted) ? 0 : -Get.height,
-              duration: Duration(milliseconds: 1200),
-              curve: Curves.bounceOut,
-              onEnd: () {
-                //TODO : startTimeDiffTimer
-                _timerController.toggle = _.user.isCommuted;
-                _timerController.startTimer();
-              },
-              child: _.user.statePanelWidget),
+          builder: (_) =>
+              AnimatedPositioned(
+                  top: (_.user.isCommuted) ? 0 : -Get.height,
+                  duration: Duration(milliseconds: 1200),
+                  curve: Curves.bounceOut,
+                  onEnd: () async {
+                    //TODO : startTimeDiffTimer
+                    // if(_controller.user.state == UserState.certificated_onWork) await distanceCheck();
+                    _timerController.toggle = _.user.isCommuted;
+                    _timerController.startTimer();
+                  },
+                  child: _.user.statePanelWidget),
         ),
         Center(
           child: Padding(
-              padding: EdgeInsets.only(top: Get.height * 0.05),
+              padding: EdgeInsets.only(top: Get.height * 0.28),
               child: GetBuilder<AController>(
                   initState: (_) {
                     if (_controller.user.isCommuted) {
@@ -88,7 +94,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             initialChildSize: 0.095,
             minChildSize: 0.085,
             maxChildSize: 0.4,
-            builder: (context, controller) => Stack(
+            builder: (context, controller) =>
+                Stack(
                   overflow: Overflow.clip,
                   children: [
                     SingleChildScrollView(
@@ -134,7 +141,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       case UserState.certificated_beforeWork:
       case UserState.certificated_workOnOutside:
         return StatePanelWidget.fromUserState(
-            UserState.certificated_beforeWork);
+            5);
       default:
         return _controller.user.statePanelWidget;
     }
@@ -164,9 +171,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           onPressed: (int index) async {
             if (!_controller.toggleList[index]) {
               _controller.user.isCommuted = !_controller.user.isCommuted;
-              _controller.user.state = _controller.user.isCommuted ? UserState.certificated_onWork : UserState.certificated_beforeWork;
+              _controller.user.state = _controller.user.isCommuted
+                  ? UserState.certificated_onWork
+                  : UserState.certificated_beforeWork;
 
-              if(_controller.user.state == UserState.certificated_workOnOutside) await _controller.updateUserWorkTimeWhileOutside(); // 외근일 경우 외근 종료 업데이트
 
               await _controller.updateUserData();
 
@@ -177,27 +185,39 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         ),
         FlatButton(
           onPressed: () async {
-            if(!_controller.user.isCommuted) {
+            if (!_controller.user.isCommuted) {
               _controller.user.isCommuted = !_controller.user.isCommuted;
               _controller.toggleList = _controller.toggleList.reversed.toList();
             }
-            _controller.user.state = _controller.user.isCommuted ? UserState.certificated_workOnOutside : UserState.certificated_beforeWork;
+            switch (_controller.user.state) {
+              case UserState.certificated_beforeWork:
+              case UserState.certificated_onWork:
+                _controller.user.state = UserState.certificated_workOnOutside;
+                await _controller
+                    .setUserWorkTimeWhileOutside();
+                break;
+              default:
+                _controller.user.state = UserState.certificated_onWork;
+                await _controller.updateUserWorkTimeWhileOutside();
+                break;
+            }
             await _controller.updateUserData();
-            await _controller.setUserWorkTimeWhileOutside();
             _controller.update();
           },
           child: Text(
-            "외근 시작",
+            (_controller.user.state == UserState.certificated_workOnOutside)
+                ? "외근 복귀"
+                : "외근 시작",
             style: TextStyle(color: Colors.green[700]),
           ),
           shape:
-              RoundedRectangleBorder(
-                side: BorderSide(color: Colors.green[500]),
-                  borderRadius: BorderRadius.circular(15.0)
-              ),
+          RoundedRectangleBorder(
+              side: BorderSide(color: Colors.green[500]),
+              borderRadius: BorderRadius.circular(15.0)
+          ),
           splashColor: Colors.green[300],
         ),
-        MapWidget(CameraPosition(target: _controller.compPosition))
+        MapWidget(CameraPosition(target: _controller.compPosition, zoom: 15.5))
       ],
     );
   }
@@ -216,7 +236,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         });
         break;
       case UserState.network_required:
-      case UserState.permission_required:// exit(0) logic needed
+      case UserState.permission_required: // exit(0) logic needed
         return buildFlatBtn(() {
           if (Platform.isAndroid)
             SystemNavigator.pop();

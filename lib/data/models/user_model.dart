@@ -17,7 +17,8 @@ class UserModel {
     this._lastUpdatedAt = DateTime.now();
     this._isCommuted = isCommuted ?? false;
     this._state = state ?? UserState.certificated_beforeWork;
-    this._statePanelWidget = StatePanelWidget.fromUserState(this._state);
+    this._statePanelWidget = StatePanelWidget.fromUserState(this._state.index);
+
   }
 
   String get userId => this._userId;
@@ -43,13 +44,24 @@ class UserModel {
         this._lastUpdatedAt =
             DateTime.tryParse(record["updatedAt"]).toLocal() ?? DateTime.now(),
         this._state = UserState.values.firstWhere((e)=> e.index == record["state"]),
-        this._isCommuted = record["state"] == null ? false : record["state"]>3 ? true : false,
-        this._statePanelWidget = StatePanelWidget.fromUserState(
-            record["state"]<3
-                ? UserState.certificated_beforeWork
-                : record["state"] == 4
-                ? UserState.certificated_onWork
-                : UserState.certificated_workOnOutside);
+        this._isCommuted = record["state"] == null ? false : record["state"]>5 ? true : false,
+        this._statePanelWidget = StatePanelWidget.fromUserState(record["state"]);
+
+  defineState(int index){
+    switch(index){
+     case 5:
+       return UserState.certificated_beforeWork;
+       break;
+   case 6:
+     return UserState.certificated_onWork;
+       break;
+   case 7:
+     return UserState.certificated_workOnOutside;
+       break;
+
+    }
+  }
+
 
   toMap() => {
         "userId": this._userId,

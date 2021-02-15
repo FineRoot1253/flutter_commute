@@ -16,7 +16,8 @@ class HttpApi {
   }
 
   Future post(dynamic userModel, [String path = "user"]) async {
-    var res = await http.post(this._url, body: userModel.toMap());
+    print("포스트 : "+userModel.toMap().toString());
+    var res = await http.post(this._url+"/$path", body: userModel.toMap());
 
     return res;
   }

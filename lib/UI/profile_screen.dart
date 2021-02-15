@@ -1,6 +1,8 @@
+import 'package:commute/UI/widgets/map_widget.dart';
 import 'package:commute/controller/a_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ProfileScreen extends StatelessWidget {
 
@@ -34,7 +36,8 @@ class ProfileScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
         )),
         trailing: Text("${_controller.dateTimeParseToString(_controller.user.lastUpdateAt)}"),
-      )
+      ),
+      // MapWidget(CameraPosition(target: _controller.compPosition,zoom: 14.0))
     ],),);
   }
 }

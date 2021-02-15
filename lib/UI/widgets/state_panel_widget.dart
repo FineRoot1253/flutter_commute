@@ -1,4 +1,5 @@
 import 'package:commute/UI/register_screen.dart';
+import 'package:commute/UI/widgets/dialogs.dart';
 import 'package:commute/controller/a_controller.dart';
 import 'package:commute/controller/time_counter_controller.dart';
 import 'package:commute/data/models/enums.dart';
@@ -15,32 +16,33 @@ class StatePanelWidget extends StatelessWidget {
 
   StatePanelWidget(this._color, this._content, this._iconData);
 
-  factory StatePanelWidget.fromUserState(UserState state) {
+  factory StatePanelWidget.fromUserState(int index) {
     StatePanelWidget statePanelWidget;
-    switch (state) {
-      case UserState.certificated_onWork:
-        statePanelWidget =
-            StatePanelWidget(Colors.blue[800], "출근중", Icons.check);
-        break;
-      case UserState.certificated_beforeWork:
-        statePanelWidget =
-            StatePanelWidget(Colors.grey[500], "퇴근중", Icons.home);
-        break;
-      case UserState.certificated_workOnOutside:
-        statePanelWidget =
-            StatePanelWidget(Colors.green[500], "외근중", Icons.directions_car);
-        break;
-      case UserState.register_required:
-        statePanelWidget =
-            StatePanelWidget(Colors.red[400], "등록필요", Icons.error);
-        break;
-      case UserState.network_required:
+    print("새로 생성 : $index");
+    switch (index) {
+      case 1:
         statePanelWidget = StatePanelWidget(
             Colors.red[400], "근무지 이탈중!", Icons.wrong_location_sharp);
         break;
-      case UserState.permission_required:
+      case 2:
+        statePanelWidget =
+            StatePanelWidget(Colors.red[400], "등록필요", Icons.error);
+        break;
+      case 3:
         statePanelWidget = StatePanelWidget(
             Colors.red[400], "위치 권한 필요!", Icons.not_listed_location_sharp);
+        break;
+      case 5:
+        statePanelWidget =
+            StatePanelWidget(Colors.grey[500], "퇴근중", Icons.home);
+        break;
+      case 6:
+        statePanelWidget =
+            StatePanelWidget(Colors.blue[800], "출근중", Icons.check);
+        break;
+      case 7:
+        statePanelWidget =
+            StatePanelWidget(Colors.green[500], "외근중", Icons.directions_car);
         break;
       default:
         statePanelWidget = StatePanelWidget(Colors.white, " ", Icons.autorenew);
@@ -50,7 +52,9 @@ class StatePanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(this._controller.user.state);
+   if(this._iconData == Icons.check) {
+     distanceCheck();
+   }
     return Stack(overflow: Overflow.visible, children: [
       CustomPaint(
         size: Get.size,
@@ -60,7 +64,7 @@ class StatePanelWidget extends StatelessWidget {
           child: Align(
         alignment: Alignment.topCenter,
         child: Padding(
-          padding: EdgeInsets.only(top: Get.height * 0.17),
+          padding: EdgeInsets.only(top: Get.height * 0.13),
           child: Text(
             "${this._content}",
             style: TextStyle(
@@ -72,10 +76,10 @@ class StatePanelWidget extends StatelessWidget {
         child: Align(
           alignment: Alignment.topCenter,
           child: Padding(
-            padding: EdgeInsets.only(top: Get.height * 0.25),
+            padding: EdgeInsets.only(top: Get.height * 0.21),
             child: SizedBox(
               width: Get.width * 0.5,
-              height: Get.height * 0.16,
+              height: Get.height * 0.12,
               child: Card(
                 elevation: 10,
                 child: Center(
@@ -97,7 +101,7 @@ class StatePanelWidget extends StatelessWidget {
           child: Align(
         alignment: Alignment.topCenter,
         child: Padding(
-          padding: EdgeInsets.only(top: Get.height * 0.23),
+          padding: EdgeInsets.only(top: Get.height * 0.19),
           child: Card(
             shape: CircleBorder(),
             elevation: 20,
@@ -110,4 +114,6 @@ class StatePanelWidget extends StatelessWidget {
       )),
     ]);
   }
+
+
 }
