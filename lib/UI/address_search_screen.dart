@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-import 'package:commute/data/models/address_model.dart';
+import 'package:commute/data/models/model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class AddressSearchScreen extends StatelessWidget {
 
-  WebViewController _controller;
+  // WebViewController _controller;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class AddressSearchScreen extends StatelessWidget {
               }),
         ]),
         onWebViewCreated: (WebViewController controller) async {
-          _controller = controller;
+          // _controller = controller;
           // await loadHtmlFromAssets('assets/search_address.html', _controller);
         },
       ),

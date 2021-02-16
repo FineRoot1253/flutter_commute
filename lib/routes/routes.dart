@@ -1,5 +1,4 @@
-import 'package:commute/UI/main_screen.dart';
-import 'package:commute/UI/register_screen.dart';
+import 'package:commute/UI/screen.dart';
 import 'package:get/get.dart';
 
 final routes = [

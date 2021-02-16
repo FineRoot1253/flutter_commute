@@ -1,11 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:commute/data/apis/http_api.dart';
-import 'package:commute/data/apis/sp_api.dart';
-import 'package:commute/data/models/enums.dart';
-import 'package:commute/data/models/user_model.dart';
-import 'package:commute/data/models/user_workOnOutside_model.dart';
+import 'package:commute/data/apis/api.dart';
+import 'package:commute/data/models/model.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';

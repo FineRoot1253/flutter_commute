@@ -1,6 +1,3 @@
-import 'dart:ffi';
-
-import 'package:commute/data/models/user_model.dart';
 import 'package:commute/url/url.dart';
 import 'package:http/http.dart' as http;
 

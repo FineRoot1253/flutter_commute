@@ -1,5 +1,5 @@
-import 'package:commute/controller/a_controller.dart';
-import 'package:commute/data/apis/http_api.dart';
+import 'package:commute/controller/controller.dart';
+import 'package:commute/data/apis/api.dart';
 import 'package:commute/data/repository/user_repository.dart';
 import 'package:commute/url/url.dart';
 import 'package:get/get.dart';

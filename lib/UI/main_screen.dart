@@ -1,12 +1,8 @@
 import 'dart:io';
 
-import 'package:commute/UI/address_search_screen.dart';
-import 'package:commute/UI/profile_screen.dart';
-import 'package:commute/UI/widgets/map_widget.dart';
-import 'package:commute/UI/widgets/state_panel_widget.dart';
-import 'package:commute/controller/a_controller.dart';
-import 'package:commute/controller/time_counter_controller.dart';
-import 'package:commute/data/models/address_model.dart';
+import 'package:commute/UI/screen.dart';
+import 'package:commute/UI/widgets/widget.dart';
+import 'package:commute/controller/controller.dart';
 import 'package:commute/data/models/enums.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

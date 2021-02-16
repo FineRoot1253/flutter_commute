@@ -1,11 +1,9 @@
-import 'package:commute/UI/register_screen.dart';
-import 'package:commute/UI/widgets/dialogs.dart';
-import 'package:commute/controller/a_controller.dart';
-import 'package:commute/controller/time_counter_controller.dart';
-import 'package:commute/data/models/enums.dart';
+import 'package:commute/UI/screen.dart';
+import 'package:commute/UI/widgets/widget.dart';
+import 'package:commute/controller/controller.dart';
+import 'package:commute/data/models/model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class StatePanelWidget extends StatelessWidget {
   final _controller = AController.to;

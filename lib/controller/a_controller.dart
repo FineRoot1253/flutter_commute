@@ -1,14 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:commute/common/coordinates.dart';
-import 'package:commute/common/ip.dart';
-import 'package:commute/common/keywords.dart';
-import 'package:commute/data/apis/sp_api.dart';
-import 'package:commute/data/models/Location.dart';
-import 'package:commute/data/models/enums.dart';
-import 'package:commute/data/models/user_model.dart';
-import 'package:commute/data/models/user_workOnOutside_model.dart';
+import 'package:commute/common/common.dart';
+import 'package:commute/data/apis/api.dart';
+import 'package:commute/data/models/model.dart';
 import 'package:commute/data/repository/user_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';

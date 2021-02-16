@@ -1,6 +1,5 @@
-import 'package:commute/UI/widgets/state_panel_widget.dart';
-import 'package:commute/data/models/enums.dart';
-import 'package:commute/data/models/user_workOnOutside_model.dart';
+import 'package:commute/UI/widgets/widget.dart';
+import 'package:commute/data/models/model.dart';
 
 class UserModel {
   String _userId;

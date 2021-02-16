@@ -1,4 +1,4 @@
-import 'package:commute/controller/a_controller.dart';
+import 'package:commute/controller/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
