@@ -167,10 +167,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           onPressed: (int index) async {
             if (!_controller.toggleList[index]) {
               _controller.user.isCommuted = !_controller.user.isCommuted;
-              _controller.user.state = _controller.user.isCommuted
-                  ? UserState.certificated_onWork
-                  : UserState.certificated_beforeWork;
 
+              if(_controller.user.isCommuted){
+                _controller.user.onWorkTime = DateTime.now();
+                _controller.user.state = UserState.certificated_onWork;
+              }else{
+                _controller.user.offWorkTime = DateTime.now();
+                _controller.user.state = UserState.certificated_beforeWork;
+              }
 
               await _controller.updateUserData();
 

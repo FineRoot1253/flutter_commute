@@ -69,11 +69,6 @@ class AController extends GetxController{
     return Future<void>.value();
   }
 
-  String calculateTimeDiff() {
-    Duration diff = DateTime.now().difference(this._user.lastUpdateAt.toUtc());
-    return durationParseToString(diff) + "경과";
-  }
-
   String durationParseToString(Duration date){
     return "${date.inHours} : ${date.inMinutes.remainder(60)} : ${date.inSeconds.remainder(60)} 초 ";
   }

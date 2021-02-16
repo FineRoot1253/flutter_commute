@@ -86,7 +86,7 @@ class StatePanelWidget extends StatelessWidget {
                     builder: (_) => (this._controller.user.state ==
                             UserState.certificated_onWork)
                         ? Text(_.calculateTimeDiff(
-                            this._controller.user.lastUpdateAt.toLocal()))
+                            this._controller.user.onWorkTime.toLocal()))
                         : Text(this._content + "인 상태입니다."),
                   ),
                 ),

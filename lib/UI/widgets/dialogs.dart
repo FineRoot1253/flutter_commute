@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 Future distanceCheck() async {
   return AController.to.distanceCheck().then((value) => value
       ? Get.defaultDialog(
-          title: "위치 확인", content: Text("확인 완료"), onConfirm: () => Get.back())
+          title: "위치 확인", content: Text("확인 완료"), buttonColor: Colors.white,textConfirm: "확인", onConfirm: () => Get.back())
       : Get.defaultDialog(
     barrierDismissible: false,
-          title: "경고", content: Text("근무지로 복귀 하십시오"), onConfirm: () async =>{
+          title: "경고", content: Text("근무지로 복귀 하십시오"), buttonColor: Colors.white, textConfirm: "확인", onConfirm: () async =>{
           AController.to.logOutOfRanged().then((value) => Get.back())
   }));
 }

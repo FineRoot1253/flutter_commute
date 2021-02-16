@@ -28,12 +28,12 @@ class ProfileScreen extends StatelessWidget {
         trailing: Text("${_controller.user.name}"),
       ),
       ListTile(
-        title: Text("최근 접속 일",
+        title: Text("최근 퇴근 시각",
             style: TextStyle(
             fontWeight: FontWeight.bold,
         )),
-        trailing: Text("${_controller.dateTimeParseToString(_controller.user.lastUpdateAt)}"),
-      ),
+        trailing: Text("${_controller.dateTimeParseToString(_controller.user.offWorkTime)}"),
+      )
     ],),);
   }
 }
