@@ -1,3 +1,4 @@
+import 'package:commute/common/common.dart';
 import 'package:commute/common/keywords.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,7 +14,7 @@ class Location{
     BitmapDescriptor icon = title.startsWith("근무지") ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure) : BitmapDescriptor.defaultMarker;
     LatLng _latLng = latLng ?? LatLng(0.0, 0.0);
     this._marker = Marker(markerId: MarkerId(uId),position: _latLng,infoWindow: InfoWindow(title: contentTitle),icon: icon);
-    this._circle = Circle(circleId: CircleId(uId),center: _latLng,radius: 150,fillColor: Colors.blue[400].withOpacity(0.4),strokeWidth: 0);
+    this._circle = Circle(circleId: CircleId(uId),center: _latLng,radius: DEFAULT_RADIUS,fillColor: Colors.blue[400].withOpacity(0.4),strokeWidth: 0);
   }
 
   Marker get marker => this._marker;

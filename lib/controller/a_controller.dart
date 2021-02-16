@@ -177,7 +177,11 @@ class AController extends GetxController{
 
   Future distanceCheck() async {
     await getUserLocation();
-    return calculateDistanceDiff() <= 150 ? Future.value(true) : Future.value(false);
+    return calculateDistanceDiff() <= DEFAULT_RADIUS ? Future.value(true) : Future.value(false);
+  }
+
+  Future logOutOfRanged() async {
+    await this.userRepository.logOutOfRangeUser(LogUserModel(userId: this._user.userId));
   }
 
 }
