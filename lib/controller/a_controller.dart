@@ -171,8 +171,8 @@ class AController extends GetxController{
       await this.userRepository.getUserWorkOnOutsideData(this._user.userId);
   }
 
-  setUserWorkTimeWhileOutside() async {
-    if(this._wooModel==null) this._wooModel = UserWOOModel(userId : this._user.userId, destination: "unknown");
+  setUserWorkTimeWhileOutside(String dest) async {
+    this._wooModel = UserWOOModel(userId: this._user.userId, destination: dest);
     if(this._user.state == UserState.certificated_workOnOutside) await this.userRepository.setUserWorkOnOutsideData(this._wooModel);
   }
 

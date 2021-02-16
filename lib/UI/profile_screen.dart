@@ -37,7 +37,6 @@ class ProfileScreen extends StatelessWidget {
         )),
         trailing: Text("${_controller.dateTimeParseToString(_controller.user.lastUpdateAt)}"),
       ),
-      // MapWidget(CameraPosition(target: _controller.compPosition,zoom: 14.0))
     ],),);
   }
 }

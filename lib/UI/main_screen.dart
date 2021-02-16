@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:commute/UI/address_search_screen.dart';
 import 'package:commute/UI/profile_screen.dart';
-import 'package:commute/UI/widgets/dialogs.dart';
 import 'package:commute/UI/widgets/map_widget.dart';
 import 'package:commute/UI/widgets/state_panel_widget.dart';
 import 'package:commute/controller/a_controller.dart';
 import 'package:commute/controller/time_counter_controller.dart';
+import 'package:commute/data/models/address_model.dart';
 import 'package:commute/data/models/enums.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   Widget buildMainContent() {
-    print(_controller.user.isCommuted); //TODO: usermodel 생성자에 로그 찍어보ㄱ
     return Stack(
       overflow: Overflow.visible,
       children: [
@@ -185,22 +185,26 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         ),
         FlatButton(
           onPressed: () async {
-            if (!_controller.user.isCommuted) {
-              _controller.user.isCommuted = !_controller.user.isCommuted;
-              _controller.toggleList = _controller.toggleList.reversed.toList();
-            }
             switch (_controller.user.state) {
               case UserState.certificated_beforeWork:
               case UserState.certificated_onWork:
+              var addr = await Get.to(AddressSearchScreen());
+              if(addr==null) return;
                 _controller.user.state = UserState.certificated_workOnOutside;
                 await _controller
-                    .setUserWorkTimeWhileOutside();
+                    .setUserWorkTimeWhileOutside(addr.address);
                 break;
               default:
                 _controller.user.state = UserState.certificated_onWork;
                 await _controller.updateUserWorkTimeWhileOutside();
                 break;
             }
+
+            if (!_controller.user.isCommuted) {
+              _controller.user.isCommuted = !_controller.user.isCommuted;
+              _controller.toggleList = _controller.toggleList.reversed.toList();
+            }
+
             await _controller.updateUserData();
             _controller.update();
           },

@@ -5,6 +5,7 @@ import 'package:commute/bindings/bindings.dart';
 import 'package:commute/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,7 +22,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    if(Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
+
 
   @override
   Widget build(BuildContext context) {

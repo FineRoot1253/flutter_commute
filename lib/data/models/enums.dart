@@ -12,8 +12,3 @@ enum UserState{
 extension ParseToString on UserState{
   String toShortString() => this.toString().split('.').last;
 }
-
-extension StringToUserState on UserState{
-
-
-}
